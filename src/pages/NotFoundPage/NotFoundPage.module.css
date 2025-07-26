@@ -1,0 +1,24 @@
+.page {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.page h1 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.page p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.link {
+  font-size: 1rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
