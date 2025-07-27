@@ -1,0 +1,12 @@
+.breadcrumbs {
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+.breadcrumbs a {
+  color: #007bff;
+  text-decoration: none;
+}
+.breadcrumbs .sep {
+  margin: 0 0.5rem;
+  color: #555;
+}

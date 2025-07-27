@@ -1,4 +1,4 @@
-import Button from "../../shared/components/Button/Button";
+import Button from "../../../shared/components/Button/Button";
 import styles from "./HeroBanner.module.css";
 
 const HeroBanner = () => (

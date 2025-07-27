@@ -1,18 +1,22 @@
+/* src/pages/SalePage/SalePage.module.css */
 .page {
   padding: 2rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 2rem;
   margin-top: 1.5rem;
 }
-
 .empty {
   text-align: center;
   color: #777;
   margin-top: 2rem;
+}
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
 }

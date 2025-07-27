@@ -1,56 +1,90 @@
-import HeroBanner from "../../modules/HeroBanner/HeroBanner";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+import HeroBanner from "./HeroBanner/HeroBanner";
 import Section from "../../shared/components/SectionTitle/SectionTitle";
-import CategoryCard from "../../shared/components/CategoryCard/CategoryCard";
-import ProductCard from "../../shared/components/ProductCard/ProductCard";
-import Button from "../../shared/components/Button/Button";
+import CategoryCard from "../CategoriesPage/CategoryCard/CategoryCard";
+import ProductCard from "../ProductPage/ProductCard/ProductCard";
+import FirstOrderBanner from "./FirstOrderBanner/FirstOrderBanner";
+
+import { getCategories, getProducts } from "../../api/api";
 import styles from "./HomePage.module.css";
 
-const demoCategories = [
-  { id: 1, name: "Dry & Wet Food", image: "/assets/cat1.jpg" },
-  { id: 2, name: "Toys", image: "/assets/cat2.jpg" },
-  { id: 3, name: "Beds", image: "/assets/cat3.jpg" },
-  { id: 4, name: "Accessories", image: "/assets/cat4.jpg" },
-];
-
-const demoProducts = [
-  { id: 1, name: "Dog Food", price: 12.99, image: "/assets/prod1.jpg" },
-  { id: 2, name: "Cat Toy", price: 5.49, image: "/assets/prod2.jpg" },
-  { id: 3, name: "Pet Bed", price: 29.99, image: "/assets/prod3.jpg" },
-  { id: 4, name: "Leash", price: 9.99, image: "/assets/prod4.jpg" },
-];
+// «Розпаковує» відповідь API, якщо вона приходить обгорнута в { data: […] } чи { categories: […] }
+function extractArray(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (payload.categories && Array.isArray(payload.categories))
+    return payload.categories;
+  if (payload.data && Array.isArray(payload.data)) return payload.data;
+  return [];
+}
 
 export default function HomePage() {
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [catsPayload, prodsPayload] = await Promise.all([
+          getCategories(),
+          getProducts(),
+        ]);
+        setCategories(extractArray(catsPayload));
+        setProducts(extractArray(prodsPayload));
+      } catch (err) {
+        console.error("API load error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return <div className={styles.loader}>Loading...</div>;
+  }
+
+  // Перші 4 категорії
+  const displayedCategories = categories.slice(0, 4);
+
+  // Перші 4 товари зі знижкою (як у SalePage)
+  // Змініть поле `discount` на `discountPercentage` або інше, якщо у вас інакше
+  const displayedSale = products.filter((p) => p.discont_price > 0).slice(0, 4);
 
   return (
     <main className={styles.home}>
       <HeroBanner />
 
-      <div className={styles.wrapper}>
+      <div className={styles.container}>
+        {/* Categories */}
         <Section title="Categories" linkText="View all" linkTo="/categories">
-          {demoCategories.map((cat) => (
-            <CategoryCard key={cat.id} {...cat} />
-          ))}
+          {displayedCategories.length > 0 ? (
+            displayedCategories.map((cat) => (
+              <Link key={cat.id} to={`/categories/${cat.id}`}>
+                <CategoryCard {...cat} />
+              </Link>
+            ))
+          ) : (
+            <p>No categories available.</p>
+          )}
         </Section>
 
-        <Section title="5% off on first order">
-          <form className={styles.promoForm}>
-            <input type="text" placeholder="Name" />
-            <input type="tel" placeholder="Phone" />
-            <input type="email" placeholder="Email" />
-            <Button variant="primary" >
-              Get Discount
-            </Button>
-          </form>
-        </Section>
+        {/* 5% off banner */}
+        <FirstOrderBanner />
 
-        <Section
-          title="Discounted Items"
-          linkText="View all"
-          linkTo="/products/sale"
-        >
-          {demoProducts.map((p) => (
-            <ProductCard key={p.id} {...p} />
-          ))}
+        {/* Sale */}
+        <Section title="Sale" linkText="View all" linkTo="/sale">
+          {displayedSale.length > 0 ? (
+            displayedSale.map((prod) => (
+              <Link key={prod.id} to={`/products/${prod.id}`}>
+                <ProductCard {...prod} />
+              </Link>
+            ))
+          ) : (
+            <p>No sale items available.</p>
+          )}
         </Section>
       </div>
     </main>
