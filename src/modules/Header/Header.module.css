@@ -28,7 +28,7 @@
 
 .cart a svg {
   position: relative;
-  font-size: 1.5rem;
+  width: 40px;
 }
 
 .counter a svg {

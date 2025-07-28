@@ -12,8 +12,8 @@ function App() {
       <Header />
       <div className="container">
         <Navigation />
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }

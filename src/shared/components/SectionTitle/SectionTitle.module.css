@@ -7,25 +7,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2.5rem;
+  margin-top: 4rem;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
 .title {
-  font-size: 2rem;
+  font-size:3.2rem;
   font-weight: 700;
   color: #222;
 }
 
 
 .link {
-  font-size: 0.9rem;
-  color: #007bff;
   text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #8B8B8B;
 }
 
 .link:hover {
@@ -35,8 +37,18 @@ h2 {
 .content {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  justify-content: space-between;
   align-items: flex-start;
+}
+.content a {
+  text-decoration: none;
+  color: #282828;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.content a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {

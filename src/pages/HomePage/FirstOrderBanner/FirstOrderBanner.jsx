@@ -1,24 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./FirstOrderBanner.module.css";
-
-// нові імпорти
 import InputField from "../../../shared/components/InputField/InputField";
 import Button from "../../../shared/components/Button/Button";
-import animalsImage from "../../../assets/FirstOrderBanner.png"; 
+
+import animalsImage from "../../../assets/FirstOrderBanner.png"; // Adjust the path as needed
 
 export default function FirstOrderBanner() {
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: відправка на бекенд
-    console.log("Subscribe form:", form);
+    // TODO: тут відправка на бекенд
     setSubmitted(true);
+    setShowToast(true);
   };
+
+  // Ховаємо тост через 3 сек
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   return (
     <div className={styles.banner}>
@@ -27,7 +35,6 @@ export default function FirstOrderBanner() {
       <form className={styles.form} onSubmit={handleSubmit}>
         <InputField
           name="name"
-          type="text"
           placeholder="Name"
           value={form.name}
           onChange={handleChange}
@@ -50,7 +57,8 @@ export default function FirstOrderBanner() {
           required
         />
 
-        <Button  type="submit"
+        <Button
+          type="submit"
           disabled={submitted}
           className={submitted ? styles.submitted : styles.button}
         >
@@ -58,8 +66,19 @@ export default function FirstOrderBanner() {
         </Button>
       </form>
 
-      {/* Картинка тварин */}
-      <img className={styles.animalsImage} src={animalsImage} alt="" />
+      {/* Тост-повідомлення */}
+      {showToast && (
+        <div className={styles.toast}>
+          Your request has been submitted successfully!
+        </div>
+      )}
+
+      <img
+        src={animalsImage}
+        alt=""
+        aria-hidden="true"
+        className={styles.animalsImage}
+      />
     </div>
   );
 }

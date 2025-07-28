@@ -10,20 +10,20 @@ function Header() {
       {/* Логотип як компонент */}
       <div className={styles.logo}>
         <Link to="/">
-          <Logo width={140} height={50} />
+          <Logo />
         </Link>
       </div>
 
       <nav className={styles.nav}>
-        <Link to="/">Home</Link>
+        <Link to="/">Main Page</Link>
         <Link to="/categories">Categories</Link>
         <Link to="/products/all">All Products</Link>
-        <Link to="/products/sale">Sale</Link>
+        <Link to="/products/sale">All Sales</Link>
       </nav>
 
       <div className={styles.cart}>
         <Link to="/cart">
-          <Basket size={28} />
+          <Basket />
         </Link>
       </div>
     </header>

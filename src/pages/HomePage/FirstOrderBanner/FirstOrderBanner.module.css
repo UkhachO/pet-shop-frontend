@@ -9,7 +9,8 @@
 
 .title {
   text-align: center;
-  font-size: 2rem;
+  font-size: 4rem;
+  font-weight: 700;
   margin-bottom: 1.5rem;
 }
 
@@ -60,3 +61,25 @@
   height: 85%; /* підкоригуйте за потреби */
   pointer-events: none; /* щоб інпути та кнопка були клікабельні */
 }
+
+.toast {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(255,255,255,0.95);
+  color: #0056ff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-weight: bold;
+  z-index: 100;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+

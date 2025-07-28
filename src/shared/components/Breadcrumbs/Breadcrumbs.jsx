@@ -6,7 +6,7 @@ import styles from "./Breadcrumbs.module.css";
 const nameMap = {
   products: "All Products",
   categories: "Categories",
-  sale: "Sale",
+  sale: "All Sales",
   cart: "Cart",
 };
 
@@ -36,7 +36,7 @@ export default function Breadcrumbs() {
 
   return (
     <nav className={styles.breadcrumbs}>
-      <Link to="/">Home</Link>
+      <Link to="/">Main Page</Link>
       {crumbs.map((c, i) => (
         <React.Fragment key={c.to}>
           <span className={styles.sep}>/</span>

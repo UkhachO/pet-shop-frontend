@@ -59,7 +59,11 @@ export default function HomePage() {
 
       <div className={styles.container}>
         {/* Categories */}
-        <Section title="Categories" linkText="View all" linkTo="/categories">
+        <Section
+          title="Categories"
+          linkText="All categories "
+          linkTo="/categories"
+        >
           {displayedCategories.length > 0 ? (
             displayedCategories.map((cat) => (
               <Link key={cat.id} to={`/categories/${cat.id}`}>
@@ -75,7 +79,7 @@ export default function HomePage() {
         <FirstOrderBanner />
 
         {/* Sale */}
-        <Section title="Sale" linkText="View all" linkTo="/sale">
+        <Section title="Sale" linkText="All sales" linkTo="/sale">
           {displayedSale.length > 0 ? (
             displayedSale.map((prod) => (
               <Link key={prod.id} to={`/products/${prod.id}`}>
