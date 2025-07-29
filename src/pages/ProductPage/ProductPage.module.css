@@ -1,47 +1,126 @@
-/* src/pages/ProductPage/ProductPage.module.css */
 .page {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 2rem auto;
+  padding: 0 1rem;
 }
+
+.tags {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+.imageWrap {
+  text-align: center;
+}
+
 .image {
-  flex: 1 1 300px;
-  max-width: 400px;
-  width: 100%;
+  max-width: 100%;
+  height: auto;
   border-radius: 8px;
-  object-fit: cover;
+  object-fit: contain;
 }
+
 .details {
-  flex: 1 1 300px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
+
 .title {
   font-size: 2rem;
   margin: 0;
 }
+
 .prices {
   display: flex;
-  gap: 1rem;
   align-items: baseline;
+  gap: 1rem;
 }
+
+.current {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
 .old {
   text-decoration: line-through;
   color: #888;
 }
-.new {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #e91e63;
+
+.badge {
+  background: #005cff;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
-.price {
-  font-size: 1.5rem;
-  font-weight: bold;
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
-.desc {
+
+.qtyBtn {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.qty {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.addButton {
+  margin-left: auto;
+  padding: 0.6rem 1.2rem;
+}
+
+.description h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.description p {
+  margin: 0;
   color: #555;
   line-height: 1.5;
+}
+
+.readMore {
+  background: none;
+  border: none;
+  color: #005cff;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
 }

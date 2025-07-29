@@ -1,25 +1,27 @@
 // src/pages/CategoryPage/CategoryPage.jsx
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCategories, getProducts } from "../../api/api";
 import ProductCard from "../ProductPage/ProductCard/ProductCard";
 import Breadcrumbs from "../../shared/components/Breadcrumbs/Breadcrumbs";
+import CategoryFilters from "../../shared/components/CategoryFilters/CategoryFilters";
 import styles from "./CategoryPage.module.css";
 
 export default function CategoryPage() {
-  const { id } = useParams(); // id категорії з url /categories/:id
+  const { id } = useParams();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // стани фільтрів
+  // filter states
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
-  const [discountedOnly, setDiscountedOnly] = useState(false);
-  const [sortOption, setSortOption] = useState("default");
+  const [onlyDiscounted, setOnlyDiscounted] = useState(false);
+  const [sortBy, setSortBy] = useState("default");
 
   useEffect(() => {
-    async function load() {
+    async function loadAll() {
       try {
         const [cats, prods] = await Promise.all([
           getCategories(),
@@ -27,50 +29,44 @@ export default function CategoryPage() {
         ]);
         setCategories(Array.isArray(cats) ? cats : []);
         setProducts(Array.isArray(prods) ? prods : []);
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     }
-    load();
+    loadAll();
   }, []);
 
   if (loading) {
     return <div className={styles.loader}>Loading...</div>;
   }
 
-  // Знаходимо назву поточної категорії
+  // find our category
   const currentCat = categories.find((c) => String(c.id) === id);
-  const catName = currentCat?.name || "";
+  // pick the right field: name or title or label
+  const catName =
+    currentCat?.name ?? currentCat?.title ?? currentCat?.label ?? "Category";
 
-  // Всі товари в цій категорії
-  let filtered = products.filter((p) => String(p.categoryId) === id);
+  // filter products to this category
+  let items = products.filter((p) => String(p.categoryId) === id);
 
-  // Фільтруємо за ціною
-  if (priceFrom !== "") {
-    filtered = filtered.filter((p) => p.price >= parseFloat(priceFrom));
-  }
-  if (priceTo !== "") {
-    filtered = filtered.filter((p) => p.price <= parseFloat(priceTo));
-  }
-
-  // Лише зі знижкою
-  if (discountedOnly) {
-    filtered = filtered.filter(
+  if (priceFrom !== "") items = items.filter((p) => p.price >= +priceFrom);
+  if (priceTo !== "") items = items.filter((p) => p.price <= +priceTo);
+  if (onlyDiscounted) {
+    items = items.filter(
       (p) => typeof p.discont_price === "number" && p.discont_price < p.price
     );
   }
 
-  // Сортування
-  if (sortOption === "price-asc") {
-    filtered = filtered.slice().sort((a, b) => a.price - b.price);
-  } else if (sortOption === "price-desc") {
-    filtered = filtered.slice().sort((a, b) => b.price - a.price);
-  } else if (sortOption === "name-asc") {
-    filtered = filtered
-      .slice()
-      .sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
+  if (sortBy === "price-asc") {
+    items = [...items].sort((a, b) => a.price - b.price);
+  } else if (sortBy === "price-desc") {
+    items = [...items].sort((a, b) => b.price - a.price);
+  } else if (sortBy === "name-asc") {
+    items = [...items].sort((a, b) =>
+      (a.title || a.name).localeCompare(b.title || b.name)
+    );
   }
 
   return (
@@ -79,56 +75,20 @@ export default function CategoryPage() {
 
       <h1 className={styles.heading}>{catName}</h1>
 
-      {/* Фільтри */}
-      <div className={styles.filters}>
-        <div className={styles.filterItem}>
-          <label>Price: </label>
-          <input
-            type="number"
-            placeholder="from"
-            value={priceFrom}
-            onChange={(e) => setPriceFrom(e.target.value)}
-            className={styles.input}
-          />
-          <input
-            type="number"
-            placeholder="to"
-            value={priceTo}
-            onChange={(e) => setPriceTo(e.target.value)}
-            className={styles.input}
-          />
-        </div>
+      <CategoryFilters
+        priceFrom={priceFrom}
+        priceTo={priceTo}
+        onlyDiscounted={onlyDiscounted}
+        sortBy={sortBy}
+        onPriceFromChange={setPriceFrom}
+        onPriceToChange={setPriceTo}
+        onOnlyDiscountedChange={setOnlyDiscounted}
+        onSortByChange={setSortBy}
+      />
 
-        <div className={styles.filterItem}>
-          <label>
-            <input
-              type="checkbox"
-              checked={discountedOnly}
-              onChange={(e) => setDiscountedOnly(e.target.checked)}
-            />{" "}
-            Discounted items
-          </label>
-        </div>
-
-        <div className={styles.filterItem}>
-          <label>Sorted: </label>
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className={styles.select}
-          >
-            <option value="default">by default</option>
-            <option value="price-asc">price ↑</option>
-            <option value="price-desc">price ↓</option>
-            <option value="name-asc">name A→Z</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Сітка продуктів */}
-      {filtered.length > 0 ? (
+      {items.length > 0 ? (
         <div className={styles.productsGrid}>
-          {filtered.map((prod) => (
+          {items.map((prod) => (
             <ProductCard
               key={prod.id}
               id={prod.id}
@@ -136,7 +96,6 @@ export default function CategoryPage() {
               price={prod.price}
               image={prod.image || prod.imageUrl}
               discont_price={prod.discont_price}
-              // onAddToCart – якщо потрібно
             />
           ))}
         </div>

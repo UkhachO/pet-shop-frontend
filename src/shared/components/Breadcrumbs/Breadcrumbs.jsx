@@ -1,6 +1,8 @@
 // src/shared/components/Breadcrumbs/Breadcrumbs.jsx
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { getCategories } from "../../../api/api";
 import styles from "./Breadcrumbs.module.css";
 
 const nameMap = {
@@ -10,39 +12,85 @@ const nameMap = {
   cart: "Cart",
 };
 
+function capitalizeSegment(seg) {
+  return seg
+    .split("-")
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 export default function Breadcrumbs() {
   const { pathname } = useLocation();
-
-  // розбиваємо шлях на сегменти
   let parts = pathname.split("/").filter(Boolean);
 
-  // якщо ми на "/products/all", інтерпретуємо як "/products"
+  // Якщо /products/all — показуємо тільки “products”
   if (parts[0] === "products" && parts[1] === "all") {
     parts = ["products"];
   }
 
-  // будуємо масив об'єктів { name, to }
-  const crumbs = parts.map((part, idx) => {
-    const name = nameMap[part] || part.charAt(0).toUpperCase() + part.slice(1);
-    let to;
-    // для products ведемо на /products/all
-    if (part === "products") {
-      to = "/products/all";
+  const [categoryMap, setCategoryMap] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const map = {};
+          data.forEach((c) => {
+            // зберігаємо під числовим id
+            map[String(c.id)] = c.title;
+            // якщо є slug — зберігаємо і під ним
+            if (c.slug) {
+              map[c.slug] = c.title;
+            }
+          });
+          setCategoryMap(map);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const crumbs = [{ name: "Main page", to: "/" }];
+
+  parts.forEach((part, idx) => {
+    let label;
+
+    if (parts[idx - 1] === "categories") {
+      // для категорій шукаємо в мапі під будь-яким ключем
+      label = loading
+        ? "Loading..."
+        : categoryMap[part] || capitalizeSegment(part);
     } else {
-      to = "/" + parts.slice(0, idx + 1).join("/");
+      label = nameMap[part] || capitalizeSegment(part);
     }
-    return { name, to };
+
+    const to =
+      part === "products"
+        ? "/products/all"
+        : "/" + parts.slice(0, idx + 1).join("/");
+
+    crumbs.push({ name: label, to });
   });
 
   return (
     <nav className={styles.breadcrumbs}>
-      <Link to="/">Main Page</Link>
-      {crumbs.map((c, i) => (
-        <React.Fragment key={c.to}>
-          <span className={styles.sep}>/</span>
-          <Link to={c.to}>{c.name}</Link>
-        </React.Fragment>
-      ))}
+      {crumbs.map((crumb, i) => {
+        const isLast = i === crumbs.length - 1;
+        return (
+          <React.Fragment key={crumb.to}>
+            <Link
+              to={crumb.to}
+              className={`${styles.crumb} ${isLast ? styles.current : ""}`}
+            >
+              {crumb.name}
+            </Link>
+            {!isLast && <span className={styles.sep} />}
+          </React.Fragment>
+        );
+      })}
     </nav>
   );
 }

@@ -7,7 +7,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 2rem;
+  gap: 4rem;
   margin-top: 1.5rem;
 }
 .empty {
@@ -19,4 +19,35 @@
   color: red;
   text-align: center;
   margin-top: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4rem;
+  margin: 1.5rem 0;
+  margin-bottom: 3rem;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input,
+.select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.input {
+  width: 80px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #333;
 }
