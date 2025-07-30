@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { getCategories } from "../../../api/api";
 import styles from "./Breadcrumbs.module.css";
 
@@ -23,47 +24,57 @@ export default function Breadcrumbs() {
   const { pathname } = useLocation();
   let parts = pathname.split("/").filter(Boolean);
 
-  // Якщо /products/all — показуємо тільки “products”
+  // якщо /products/all – відображаємо лише «products»
   if (parts[0] === "products" && parts[1] === "all") {
     parts = ["products"];
   }
 
+  // підтягуємо категорії
   const [categoryMap, setCategoryMap] = useState({});
-  const [loading, setLoading] = useState(true);
-
+  const [catsLoading, setCatsLoading] = useState(true);
   useEffect(() => {
     getCategories()
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const map = {};
-          data.forEach((c) => {
-            // зберігаємо під числовим id
-            map[String(c.id)] = c.title;
-            // якщо є slug — зберігаємо і під ним
-            if (c.slug) {
-              map[c.slug] = c.title;
-            }
-          });
-          setCategoryMap(map);
-        }
-        setLoading(false);
+      .then((cats) => {
+        const m = {};
+        cats.forEach((c) => {
+          m[String(c.id)] = c.title || c.name;
+          if (c.slug) m[c.slug] = c.title || c.name;
+        });
+        setCategoryMap(m);
       })
-      .catch(() => {
-        setLoading(false);
-      });
+      .finally(() => setCatsLoading(false));
   }, []);
+
+  // беремо весь список продуктів (якщо він вже є)
+  const products = useSelector((s) => s.products.list);
+  // і поточний завантажений продукт
+  const current = useSelector((s) => s.products.current);
 
   const crumbs = [{ name: "Main page", to: "/" }];
 
   parts.forEach((part, idx) => {
+    const prev = parts[idx - 1];
     let label;
 
-    if (parts[idx - 1] === "categories") {
-      // для категорій шукаємо в мапі під будь-яким ключем
-      label = loading
+    if (prev === "categories") {
+      // крихта категорії
+      label = catsLoading
         ? "Loading..."
         : categoryMap[part] || capitalizeSegment(part);
+    } else if (prev === "products" && part !== "all") {
+      // крихта продукту
+      // спочатку шукаємо в products.list
+      const fromList = products.find((p) => String(p.id) === part);
+      if (fromList) {
+        label = fromList.title || fromList.name;
+      } else if (current && String(current.id) === part) {
+        // інакше беремо з current
+        label = current.title || current.name;
+      } else {
+        label = part; // fallback
+      }
     } else {
+      // інші сегменти
       label = nameMap[part] || capitalizeSegment(part);
     }
 

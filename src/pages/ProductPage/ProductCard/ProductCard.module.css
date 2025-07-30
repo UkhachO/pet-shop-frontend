@@ -1,3 +1,5 @@
+/* src/shared/components/ProductCard/ProductCard.module.css */
+
 .card {
   width: 240px;
   background: #fff;
@@ -6,6 +8,8 @@
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease;
+  border: 1px solid #dddddd;
+  text-decoration: none;
 }
 .card:hover {
   transform: scale(1.05);
@@ -49,7 +53,7 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 0.75rem 1rem;
-  background-color: #0D50FF;
+  background-color: #0d50ff;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -60,18 +64,32 @@
   transition: opacity 0.3s ease, background-color 0.2s ease;
   z-index: 2;
 }
-
-/* з’являється при hover картки */
 .card:hover .addToCart {
   opacity: 1;
   visibility: visible;
 }
-
-/* hover стан самої кнопки */
 .addToCart:hover {
   background-color: #282828;
 }
 
+/* Нова кнопка «Added» */
+.addedButton {
+  position: absolute;
+  width: 90%;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1rem;
+  background-color: #fff;
+  color: #282828;
+  border: 1px solid #282828;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: default;
+  z-index: 2;
+}
+
+/* Інформація про продукт */
 .info {
   padding: 0.75rem 1rem 1rem;
 }
@@ -84,18 +102,20 @@
   height: 3rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #282828;
 }
 
 .prices {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  color: #282828;
 }
 
 .currentPrice {
   font-size: 2.5rem;
   font-weight: 600;
-  color: #282828;
+  text-decoration: none;
 }
 
 .originalPrice {

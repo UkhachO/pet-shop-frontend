@@ -7,7 +7,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.logo a svg{
+.logo a svg {
   height: 40px;
 }
 
@@ -26,18 +26,26 @@
   color: #007bff;
 }
 
-.cart a svg {
-  position: relative;
-  width: 40px;
+.cartLink {
+  position: relative; /* для позиціонування бейджа */
+  display: inline-block;
 }
 
-.counter a svg {
-  background-color: red;
-  color: white;
-  font-size: 0.75rem;
-  padding: 2px 6px;
-  border-radius: 50%;
+.cartLink svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* Бейдж з лічильником */
+.badge {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: -6px;
+  left: -6px;         /* було right: -6px; */
+  background-color: #0d50ff;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 12px;
 }

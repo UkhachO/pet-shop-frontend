@@ -1,130 +1,172 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { addItem, removeItem, clearCart } from "../../redux/cart-slice";
+import { removeItem, clearCart, addItem } from "../../redux/cart-slice";
 import SectionTitle from "../../shared/components/SectionTitle/SectionTitle";
 import Button from "../../shared/components/Button/Button";
 import styles from "./CartPage.module.css";
 
 export default function CartPage() {
   const dispatch = useDispatch();
-  const items = useSelector((state) => state.cart.items);
+  const items = useSelector((s) => s.cart.items);
 
-  // Групуємо товари за id
-  const grouped = items.reduce((acc, item) => {
-    if (!acc[item.id]) acc[item.id] = { ...item, quantity: 0 };
-    acc[item.id].quantity += 1;
-    return acc;
-  }, {});
+  // distinct count — кількість різних продуктів
+  const totalItems = items.length;
+  // totalSum залишається сумою quantity * price
+  const totalSum = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const entries = Object.values(grouped);
-
-  // Загальна сума
-  const total = entries.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  // Локальна форма для замовлення
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
-  const handleChange = (e) => {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: axios.post("/order/send", { ...form, items })
-    console.log("Order:", { ...form, items });
     dispatch(clearCart());
+    setModalOpen(true);
   };
-
-  if (entries.length === 0) {
-    return (
-      <main className={styles.page}>
-        <SectionTitle title="Your Cart" />
-        <p className={styles.empty}>Your cart is empty.</p>
-      </main>
-    );
-  }
 
   return (
     <main className={styles.page}>
-      <SectionTitle title="Your Cart" />
-
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Qty</th>
-            <th>Subtotal</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((item) => (
-            <tr key={item.id}>
-              <td className={styles.product}>
-                <img
-                  src={`${import.meta.env.VITE_API_URL}${item.image}`}
-                  alt={item.name}
-                  className={styles.img}
-                />
-                <span>{item.name}</span>
-              </td>
-              <td>${item.price.toFixed(2)}</td>
-              <td>
-                <button onClick={() => dispatch(removeItem(item.id))}>−</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => dispatch(addItem(item))}>+</button>
-              </td>
-              <td>${(item.price * item.quantity).toFixed(2)}</td>
-              <td>
-                <button onClick={() => dispatch(removeItem(item.id))}>
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className={styles.footer}>
-        <p className={styles.total}>Total: ${total.toFixed(2)}</p>
-        <button className={styles.clear} onClick={() => dispatch(clearCart())}>
-          Clear Cart
-        </button>
+      <div className={styles.header}>
+        <SectionTitle title="Shopping cart" />
+        <Link to="/products/all" className={styles.backLink}>
+          Back to the store
+        </Link>
       </div>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h2>Checkout</h2>
-        <label>
-          Name
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Phone
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Email
-          <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <Button type="submit">Place Order</Button>
-      </form>
+      {modalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <button
+              className={styles.modalClose}
+              onClick={() => setModalOpen(false)}
+            >
+              ×
+            </button>
+            <h2>Congratulations!</h2>
+            <p>
+              Your order has been successfully placed on the website.
+              <br />A manager will contact you shortly to confirm your order.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {items.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p className={styles.empty}>
+            Looks like you have no items in your basket currently.
+          </p>
+          <Link to="/products/all" className={styles.continueBtn}>
+            Continue Shopping
+          </Link>
+        </div>
+      ) : (
+        <div className={styles.content}>
+          <div className={styles.items}>
+            {items.map((item) => {
+              const hasDiscount =
+                typeof item.originalPrice === "number" &&
+                item.originalPrice > item.price;
+
+              return (
+                <div key={item.id} className={styles.itemCard}>
+                  <img
+                    src={`${import.meta.env.VITE_API_URL}${item.image}`}
+                    alt={item.name}
+                    className={styles.itemImage}
+                  />
+
+                  <div className={styles.itemInfo}>
+                    <h3 className={styles.itemTitle}>{item.name}</h3>
+                    <div className={styles.itemControls}>
+                      <button
+                        className={styles.qtyBtn}
+                        onClick={() =>
+                          dispatch(removeItem({ id: item.id, decrement: true }))
+                        }
+                      >
+                        −
+                      </button>
+                      <span className={styles.qty}>{item.quantity}</span>
+                      <button
+                        className={styles.qtyBtn}
+                        onClick={() =>
+                          dispatch(addItem({ ...item, quantity: 1 }))
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.priceBlock}>
+                    <span className={styles.currentPrice}>
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </span>
+                    {hasDiscount && (
+                      <span className={styles.oldPrice}>
+                        ${(item.originalPrice * item.quantity).toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    className={styles.removeBtn}
+                    onClick={() =>
+                      dispatch(removeItem({ id: item.id, decrement: false }))
+                    }
+                  >
+                    ×
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <aside className={styles.orderDetails}>
+            <h2>Order details</h2>
+            <p className={styles.detailLine}>
+              <span>
+                {totalItems} item{totalItems !== 1 ? "s" : ""}
+              </span>
+            </p>
+            <p className={styles.detailLine}>
+              <span>Total</span>
+              <span className={styles.totalSum}>${totalSum.toFixed(2)}</span>
+            </p>
+
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Name"
+                required
+              />
+              <input
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="Phone number"
+                required
+              />
+              <input
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+              />
+              <Button type="submit" className={styles.orderBtn}>
+                The Order is Placed
+              </Button>
+            </form>
+          </aside>
+        </div>
+      )}
     </main>
   );
 }

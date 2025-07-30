@@ -1,6 +1,6 @@
 // src/shared/components/ProductCard/ProductCard.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addItem } from "../../../redux/cart-slice";
@@ -28,18 +28,24 @@ export default function ProductCard({
     ? Math.round(((price - discont_price) / price) * 100)
     : 0;
 
+  const [added, setAdded] = useState(false);
+
   const handleAdd = (e) => {
-    e.preventDefault(); // заблокувати перехід по Link
-    e.stopPropagation(); // не передавати подію лінку
+    e.preventDefault();
+    e.stopPropagation();
     dispatch(
       addItem({
         id,
         title,
         price: newPrice,
+        originalPrice: price,
         image,
         quantity: 1,
       })
     );
+    setAdded(true);
+    // Повернути кнопку назад через 2 секунди
+    setTimeout(() => setAdded(false), 2000);
   };
 
   return (
@@ -48,9 +54,18 @@ export default function ProductCard({
         <img src={src} alt={title} className={styles.img} />
         {hasDiscount && <div className={styles.badge}>-{percent}%</div>}
 
-        <button className={styles.addToCart} onClick={handleAdd}>
-          Add to cart
-        </button>
+        {!added ? (
+          <button className={styles.addToCart} onClick={handleAdd}>
+            Add to cart
+          </button>
+        ) : (
+          <button
+            className={styles.addedButton}
+            onClick={(e) => e.preventDefault()}
+          >
+            Added
+          </button>
+        )}
       </div>
 
       <div className={styles.info}>

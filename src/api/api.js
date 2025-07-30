@@ -1,3 +1,4 @@
+// src/api/api.js
 import axios from "axios";
 
 const api = axios.create({
@@ -5,13 +6,20 @@ const api = axios.create({
 });
 
 export function getCategories() {
-  // бекенд повертає масив за /categories
   return api.get("/categories").then((res) => res.data);
 }
 
-export  function getProducts() {
-  // бекенд повертає масив за /products/all
+export function getProducts() {
   return api.get("/products/all").then((res) => res.data);
+}
+
+// **НОВИЙ** метод — повертає один продукт із полем title (або name)
+export function getProductById(id) {
+  return api.get(`/products/${id}`).then((res) => {
+    const arr = res.data;
+    // якщо масив, беремо перший елемент
+    return Array.isArray(arr) ? arr[0] : arr;
+  });
 }
 
 export default api;

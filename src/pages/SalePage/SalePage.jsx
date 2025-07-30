@@ -56,7 +56,7 @@ export default function SalePage() {
     <main className={styles.page}>
       <Breadcrumbs />
 
-      <SectionTitle title="Discounted Items" />
+      <SectionTitle title="Discounted items" />
 
       {/* ——— ФІЛЬТРИ (як на скрині) ——— */}
       <div className={styles.filters}>
